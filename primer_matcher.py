@@ -7,13 +7,14 @@ from Bio.Alphabet import Gapped, generic_dna
 import re
 import Bio.Seq
 import sys
+import os
 
 DEBUG = 0
 
-
-infile_its = "F_ITS.fasta"
-infile_28s = "F_28S.fasta"
-outfile_name = "F_matched.fasta"
+data_dir = "data"
+infile_its = os.path.join(data_dir, "F_ITS.fasta")
+infile_28s = os.path.join(data_dir, "F_28S.fasta")
+outfile_name = os.path.join(data_dir, "F_matched.fasta")
 
 primer_its1f = "AAAACCGG"
 primer_lror = "CCCCGGTT"
