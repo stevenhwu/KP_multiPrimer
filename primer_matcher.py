@@ -14,7 +14,7 @@ DEBUG = 0
 data_dir = "data"
 infile_its = os.path.join(data_dir, "F_ITS.fasta")
 infile_28s = os.path.join(data_dir, "F_28S.fasta")
-outfile_name = os.path.join(data_dir, "F_matched.fasta")
+outfile_name = os.path.join(data_dir, "Result_matched.fasta")
 
 primer_its1f = "AAAACCGG"
 primer_lror = "CCCCGGTT"
@@ -45,59 +45,54 @@ def parseInputFile(infile):
             key = match.group()
             if key in dict_match:
                 print "===Warning===: key fragment:(%s) exist already" % key
-#                 dict_match[key].append(record)
+                dict_match[key].append(record)
 #                 print dict_match[key]
-                dict_match[key] = record
+#                 dict_match[key] = record
             else:
-                dict_match[key] = record
+                dict_match[key] = [record]
     #     print sys.getsizeof(record), len(record.seq)
     return dict_match
 
+def join_two_records(record_part1, record_part2):
 
-
-dict_its = parseInputFile(infile_its)
-dict_28s = parseInputFile(infile_28s)
-
-print dict_its.keys()
-print "================"
-print dict_28s.keys()
-
-all_new_seq = []
-
-for key in dict_its.keys():
-    if key in dict_28s:
-
-
-        id1, id2 = dict_its[key].id, dict_28s[key].id
-        print key, dict_its[key].seq.find(key), dict_its[key].seq
-        print key, dict_28s[key].seq.find(key), dict_28s[key].seq
+    if DEBUG > 2:
+        print key, record_part1.seq.find(key), record_part1.seq
+        print key, record_part2.seq.find(key), record_part2.seq
 #         prefix = dict_its[key].seq.split(key)
 #         sufix = dict_28s[key].seq.split(key)
 #         prefix_str = str(prefix[0])
 #         sufix_str = str(sufix[1])
 #         new_seq = SeqRecord(Seq(prefix_str + key + sufix_str), id=(id1 + "_" + id2))
-#         print new_seq.seq
 
-        prefix_index = dict_its[key].seq.find(key)
-        prefix_str = str(dict_its[key].seq)[0:prefix_index]
+    prefix_index = record_part1.seq.find(key)
+    prefix_str = str(record_part1.seq)[0:prefix_index]
 #         sufix_index = dict_28s[key].seq.find(key)
-        sufix_str = str(dict_28s[key].seq)
+    sufix_str = str(record_part2.seq)
+
+
+    new_seq = SeqRecord(Seq(prefix_str + sufix_str),
+                        id=(record_part1.id + "_" + record_part2.id), description="")
+    if DEBUG > 1:
         print (prefix_str)
         print (sufix_str)
+    print "Merged %s: %s" % (new_seq.id, new_seq.seq)
+    return new_seq
 
 
-        new_seq = SeqRecord(Seq(prefix_str + sufix_str),
-                            id=(id1 + "_" + id2), description="")
-        print "FINAL: %s" % new_seq.seq
-        all_new_seq.append(new_seq)
+dict_its = parseInputFile(infile_its)
+dict_28s = parseInputFile(infile_28s)
 
-#         print dict_its[key].seq[:prefix_index]
-#         print dict_28s[key].seq[sufix_index:]
-#         print prefix
-#         print sufix
-#
-#
-#
-#         new_seq = SeqRecord(Seq(prefix_str + key + sufix_str), id=(id1 + "_" + id2))
-#         print new_seq.seq
+print "================"
+print "ITS:", dict_its.keys()
+print "28S:", dict_28s.keys()
+print "================"
+all_new_seq = []
+
+for key in dict_its.keys():
+    if key in dict_28s:
+        for r1 in dict_its[key]:
+            for r2 in dict_28s[key]:
+                new_seq = join_two_records(r1, r2)
+                all_new_seq.append(new_seq)
+
 SeqIO.write(all_new_seq, outfile_name, "fasta")
