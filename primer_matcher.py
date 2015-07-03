@@ -1,11 +1,8 @@
-
 from Bio.Seq import Seq
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import Gapped, generic_dna
 
 import re
-import Bio.Seq
 import sys
 import os
 
@@ -21,11 +18,11 @@ primer_lror = "CCCCGGTT"
 primer_edf360 = "GGGGTTAA"
 primer_lr7 = "TTTTAACC"
 
-re_primer_key1 = re.compile(primer_lror)
-re_primer_key2 = re.compile(primer_lr7)
-
 pattern = primer_lror + "([ACGTN-]+)" + primer_edf360
 re_matching_seq = re.compile(pattern)
+
+# re_primer_key1 = re.compile(primer_lror)
+# re_primer_key2 = re.compile(primer_lr7)
 
 # in_handle1 = open(infile_its, "r")
 # in_handle2 = open(infile_28s, "r")
@@ -44,7 +41,10 @@ def parseInputFile(infile):
                       (match.group(), match.groups(), match.string))
             key = match.group()
             if key in dict_match:
-                print "===Warning===: key fragment:(%s) exist already" % key
+                print "===Warning===: key fragment:(%s) already exist in ID(s): " % key,
+                for r in dict_match[key]:
+                    print "%s, " % r.id,
+                print ""
                 dict_match[key].append(record)
 #                 print dict_match[key]
 #                 dict_match[key] = record
