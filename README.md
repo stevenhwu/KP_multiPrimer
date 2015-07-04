@@ -2,6 +2,13 @@
 
 Design to match sequences using multiple primers
 
+Language: **Python 2.7**
+
+Required package
+* **Biopython** - 1.65+ (migth work with older version, untested)
+
+
+
 ### Method
 Two sequencse files, ITS and 28S, shared two primers in the following way
 
